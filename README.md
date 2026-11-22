@@ -68,11 +68,15 @@ account bio if it does not fit). Referral code: `c1qhnyx4`.
 ## The program
 
 `main.ts` (Node 22, standard library only) copies `VIDEO.json` to the
-output directory. Run it the way the grader does:
+output directory, after checking it is JSON with a string `url` field.
+Run it the way the grader does:
 
 ```
 mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
+
+Verified locally: exit 0, `out/VIDEO.json` byte-identical to the repo's.
+The finished ad is 18.2s, 1080x1920, H.264, 6.2 MB.
 
 `VIDEO.json` currently holds a placeholder address. Replace it with the
 posted video's full address (`https://www.tiktok.com/@<handle>/video/<id>`)

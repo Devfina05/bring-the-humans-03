@@ -16,15 +16,31 @@
 // Local run (mirrors the grader):
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, mkdirSync } from 'node:fs';
+// Validate VIDEO.json before copying: it must be JSON with a string `url`.
+// A placeholder address is still copied (the gate refuses it, as it should);
+// a malformed file fails here, loudly, instead of handing the gate junk.
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const BOT_DIR = process.env.MAKEFUN_BOT_DIR ?? '/bot';
 const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
+const videoPath = join(BOT_DIR, 'VIDEO.json');
+let video: unknown;
+try {
+  video = JSON.parse(readFileSync(videoPath, 'utf8'));
+} catch (err) {
+  console.error(`VIDEO.json could not be read from ${BOT_DIR}: ${(err as Error).message}`);
+  process.exit(1);
+}
+if (typeof video !== 'object' || video === null || typeof (video as { url?: unknown }).url !== 'string') {
+  console.error('VIDEO.json must be an object with a string "url" field.');
+  process.exit(1);
+}
+
 mkdirSync(OUTPUT_DIR, { recursive: true });
 try {
-  copyFileSync(join(BOT_DIR, 'VIDEO.json'), join(OUTPUT_DIR, 'VIDEO.json'));
+  copyFileSync(videoPath, join(OUTPUT_DIR, 'VIDEO.json'));
 } catch (err) {
   console.error(`VIDEO.json could not be copied from ${BOT_DIR}: ${(err as Error).message}`);
   process.exit(1);
